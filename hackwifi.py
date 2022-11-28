@@ -32,11 +32,17 @@ class CollectSSID(BCScan):
         data = data.replace("\\n", "")
         data = data.split("\\xff")
         TranslateSentence = "Profil Tous les utilisateurs"
+        TranslateSentence2 = "Contenu de la cl\\x82            : "
+        TranslateSentence3 = "\\r\\n\\r\\nParam"
         windll = ctypes.windll.kernel32
         windll.GetUserDefaultUILanguage()
         lang = locale.windows_locale[windll.GetUserDefaultUILanguage()].split("_")[0]
         if (lang != "fr"):
             TranslateSentence = self.Translate("Profil Tous les utilisateurs", lang)
+            TranslateSentence2 = self.Translate("Contenu de la clée", lang)
+            TranslateSentence2 += "            : "
+            TranslateSentence3 = self.Translate("Paramètres", lang)
+            TranslateSentence3 = "\\r\\n\\r\\n" + TranslateSentence3
         profiles = []
         for line in data:
             line = line.replace(TranslateSentence, "")
@@ -46,14 +52,6 @@ class CollectSSID(BCScan):
             if (len(line) >= 30):
                 continue
             profiles.append(line)
-        if (lang != "fr"):
-            TranslateSentence2 = self.Translate("Contenu de la clée", lang)
-            TranslateSentence2 += "            : "
-            TranslateSentence3 = self.Translate("Paramètres", lang)
-            TranslateSentence3 = "\\r\\n\\r\\n" + TranslateSentence3
-        else:
-            TranslateSentence2 = "Contenu de la cl\\x82            : "
-            TranslateSentence3 = "\\r\\n\\r\\nParam"
         for ssid in profiles:
             results = str(subprocess.check_output(
                 ["netsh", "wlan", "show", "profiles", ssid, "key=clear"]))
